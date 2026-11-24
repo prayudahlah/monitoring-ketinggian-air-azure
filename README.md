@@ -2,6 +2,11 @@
 
 Azure implementation of the hydrology medallion pipeline.
 
+## Handover
+
+Mulai dari `docs/azure/agent-handover.md`. Dokumen itu menjelaskan urutan baca,
+batas no-run, inventory resource, dan status implementasi.
+
 ## Services
 
 ```text

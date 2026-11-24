@@ -1,5 +1,7 @@
 # Portal audit - Azure
 
+Untuk AI agent, mulai dari `docs/azure/agent-handover.md`.
+
 Panduan memeriksa isi komponen Azure lewat portal. Semua langkah read-only.
 Jangan klik **Run**, **Debug**, **Trigger now**, atau **Submit job**.
 
@@ -48,16 +50,16 @@ Semua harus kosong.
 
 ## 3. Key Vault
 
-Jika muncul pesan **not allowed by RBAC**, akun kamu belum punya role data
-plane. Owner subscription tidak otomatis memberi akses isi Key Vault.
+Semua anggota kelompok sudah diberi role `Key Vault Secrets User`. Owner
+subscription saja tidak memberi akses isi Key Vault.
 
-Tambahkan role lewat UI:
+Jika masih muncul pesan **not allowed by RBAC**:
 
-1. **Key Vaults > kv-hidro-gkiq7v7oc3lns > Access control (IAM)**
-2. **Add role assignment**
-3. Pilih **Key Vault Secrets User**
-4. Assign ke akun `yudafihan@gmail.com`
-5. Tunggu beberapa menit, refresh
+1. Tunggu 5 sampai 10 menit.
+2. Refresh portal.
+3. Jika masih gagal, minta admin memeriksa role assignment.
+
+Jangan mencoba membaca value secret.
 
 Setelah itu buka:
 

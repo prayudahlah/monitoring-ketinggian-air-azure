@@ -23,6 +23,16 @@
 | OIDC SP | Contributor | Resource group |
 | OIDC SP | AcrPush | ACR |
 
+## Human access
+
+| Principal | Role | Scope |
+|---|---|---|
+| 4 anggota kelompok | Owner | Subscription |
+| 4 anggota kelompok | Key Vault Secrets User | Key Vault |
+
+Owner subscription tidak memberi akses data plane ke Key Vault. Role
+`Key Vault Secrets User` diberikan terpisah ke semua anggota.
+
 ## Developer personas
 
 Subscription masih dimiliki 4 anggota kelompok sebagai Owner. Role per orang
@@ -40,6 +50,7 @@ subscription sendiri.
 
 - RBAC sistem ditegakkan pada workload identity.
 - Human access masih inherited Owner dari subscription bersama.
+- Semua anggota sudah punya `Key Vault Secrets User`.
 - OIDC SP bisa dipersempit dari Contributor RG menjadi Container Apps
   Contributor pada dua app + AcrPush.
 - Belum ada private endpoint.
