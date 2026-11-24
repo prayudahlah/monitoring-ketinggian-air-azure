@@ -36,16 +36,6 @@
           "sparkPool": {
             "referenceName": "sparksmall",
             "type": "BigDataPoolReference"
-          },
-          "parameters": {
-            "window_start": {
-              "value": "@pipeline().parameters.window_start",
-              "type": "Expression"
-            },
-            "window_end": {
-              "value": "@pipeline().parameters.window_end",
-              "type": "Expression"
-            }
           }
         }
       },
@@ -76,16 +66,6 @@
           "sparkPool": {
             "referenceName": "sparksmall",
             "type": "BigDataPoolReference"
-          },
-          "parameters": {
-            "window_start": {
-              "value": "@pipeline().parameters.window_start",
-              "type": "Expression"
-            },
-            "window_end": {
-              "value": "@pipeline().parameters.window_end",
-              "type": "Expression"
-            }
           }
         }
       },
@@ -116,16 +96,6 @@
           "sparkPool": {
             "referenceName": "sparksmall",
             "type": "BigDataPoolReference"
-          },
-          "parameters": {
-            "window_start": {
-              "value": "@pipeline().parameters.window_start",
-              "type": "Expression"
-            },
-            "window_end": {
-              "value": "@pipeline().parameters.window_end",
-              "type": "Expression"
-            }
           }
         }
       },
@@ -156,12 +126,6 @@
           "sparkPool": {
             "referenceName": "sparksmall",
             "type": "BigDataPoolReference"
-          },
-          "parameters": {
-            "predict_days": {
-              "value": "@pipeline().parameters.predict_days",
-              "type": "Expression"
-            }
           }
         }
       }

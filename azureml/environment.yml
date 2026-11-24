@@ -1,5 +1,5 @@
 $schema: https://azuremlschemas.azureedge.net/latest/environment.schema.json
 name: hydrology-training
-version: v1
+version: v3
 description: LightGBM training environment for the hydrology gold dataset.
-image: acrhidrogkiq7v7oc3lns.azurecr.io/training:v1
+image: acrhidrogkiq7v7oc3lns.azurecr.io/training:v3

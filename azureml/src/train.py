@@ -78,19 +78,23 @@ def _log_metrics(prefix: str, values: dict, horizon: int) -> None:
 
 
 def main() -> int:
-    gold_path = os.environ["GOLD_FEATURES_PATH"]
+    gold_path = os.environ.get("GOLD_FEATURES_PATH") or os.environ["GOLD_FEATURES"]
     table = DeltaTable(gold_path)
-    columns = [
-        "station_id",
-        "time_utc",
-        "is_trainable",
-        "is_partial",
-        "stage_now",
-        "dataset_version",
-        "discharge_grain",
-        *FEATURE_COLS,
-        *TARGET_COLS,
-    ]
+    columns = list(
+        dict.fromkeys(
+            [
+                "station_id",
+                "time_utc",
+                "is_trainable",
+                "is_partial",
+                "stage_now",
+                "dataset_version",
+                "discharge_grain",
+                *FEATURE_COLS,
+                *TARGET_COLS,
+            ]
+        )
+    )
     frame = table.to_pandas(columns=columns)
     frame["time_utc"] = pd.to_datetime(frame["time_utc"], utc=True)
     frame["station_id"] = frame["station_id"].astype(str)
@@ -148,17 +152,20 @@ def main() -> int:
                 train_delta = train[target] - train["stage_now"]
                 val_delta = val[target] - val["stage_now"]
 
+                eval_set = None
+                if not val.empty:
+                    eval_set = [(val[list(FEATURE_COLS)], val_delta)]
+
+                callbacks = [lgb.log_evaluation(0)]
+                if eval_set:
+                    callbacks.insert(0, lgb.early_stopping(100, verbose=False))
+
                 model = lgb.LGBMRegressor(**LGB_PARAMS)
                 model.fit(
                     train[list(FEATURE_COLS)],
                     train_delta,
-                    eval_X=val[list(FEATURE_COLS)],
-                    eval_y=val_delta,
-                    eval_metric="mae",
-                    callbacks=[
-                        lgb.early_stopping(100, verbose=False),
-                        lgb.log_evaluation(0),
-                    ],
+                    eval_set=eval_set,
+                    callbacks=callbacks,
                 )
 
                 for split_name, split_frame in (("val", val), ("test", test)):

@@ -6,7 +6,7 @@ compute: azureml:cpu-cluster
 environment: azureml:hydrology-training@latest
 code: src
 command: >-
-  GOLD_FEATURES_PATH=${{inputs.gold_features}} python train.py
+  python train.py
 environment_variables:
   MLFLOW_TRACKING_URI: https://eastasia.api.azureml.ms/mlflow/v1.0/subscriptions/838d94c7-d2fd-4c8c-8ceb-ad3ce9dfc707/resourceGroups/rg-hidrologi-v0/providers/Microsoft.MachineLearningServices/workspaces/mlw-hidrologi-v0
   MLFLOW_EXPERIMENT: hydrology-azure

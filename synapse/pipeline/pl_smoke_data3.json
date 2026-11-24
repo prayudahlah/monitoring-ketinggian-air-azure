@@ -1,0 +1,90 @@
+{
+  "properties": {
+    "description": "Smoke data 15 days, no activity parameters, retry 0.",
+    "activities": [
+      {
+        "name": "ingest",
+        "type": "SynapseNotebook",
+        "dependsOn": [],
+        "policy": {
+          "timeout": "0.04:00:00",
+          "retry": 0,
+          "retryIntervalInSeconds": 300,
+          "secureOutput": false,
+          "secureInput": false
+        },
+        "userProperties": [],
+        "typeProperties": {
+          "notebook": {
+            "referenceName": "smoke_ingest",
+            "type": "NotebookReference"
+          },
+          "sparkPool": {
+            "referenceName": "sparksmall",
+            "type": "BigDataPoolReference"
+          }
+        }
+      },
+      {
+        "name": "silver",
+        "type": "SynapseNotebook",
+        "dependsOn": [
+          {
+            "activity": "ingest",
+            "dependencyConditions": [
+              "Succeeded"
+            ]
+          }
+        ],
+        "policy": {
+          "timeout": "0.04:00:00",
+          "retry": 0,
+          "retryIntervalInSeconds": 300,
+          "secureOutput": false,
+          "secureInput": false
+        },
+        "userProperties": [],
+        "typeProperties": {
+          "notebook": {
+            "referenceName": "smoke_silver",
+            "type": "NotebookReference"
+          },
+          "sparkPool": {
+            "referenceName": "sparksmall",
+            "type": "BigDataPoolReference"
+          }
+        }
+      },
+      {
+        "name": "gold",
+        "type": "SynapseNotebook",
+        "dependsOn": [
+          {
+            "activity": "silver",
+            "dependencyConditions": [
+              "Succeeded"
+            ]
+          }
+        ],
+        "policy": {
+          "timeout": "0.04:00:00",
+          "retry": 0,
+          "retryIntervalInSeconds": 300,
+          "secureOutput": false,
+          "secureInput": false
+        },
+        "userProperties": [],
+        "typeProperties": {
+          "notebook": {
+            "referenceName": "smoke_gold",
+            "type": "NotebookReference"
+          },
+          "sparkPool": {
+            "referenceName": "sparksmall",
+            "type": "BigDataPoolReference"
+          }
+        }
+      }
+    ]
+  }
+}

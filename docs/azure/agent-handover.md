@@ -16,8 +16,9 @@ Repo ini berisi implementasi Azure untuk pipeline prediksi ketinggian air:
 Batasannya:
 
 - Fokus repo ini hanya Azure.
-- Data dan model belum dijalankan.
+- Smoke end-to-end 15 hari sudah dijalankan pada 2026-11-24.
 - API dan dashboard masih placeholder.
+- ADF fallback belum pernah dijalankan.
 - ADF memakai fallback Web Activity + polling, bukan activity notebook langsung.
 - CD belum dijalankan.
 
@@ -158,11 +159,29 @@ Status harus ditulis apa adanya. Jangan menaikkan status `defined` menjadi
 
 - Budget `budget-hidrologi-v0`: $40 per bulan.
 - Idle saat ini sekitar $6 sampai $7,5 per bulan.
-- Uji minimal end-to-end sekitar $1,50 sampai $2,00.
+- Uji minimal end-to-end sudah dijalankan sekali pada 2026-11-24.
 - Jangan menjalankan uji berulang tanpa izin.
 - Setelah run, pastikan Spark pool auto-pause dan Azure ML compute kembali 0.
+- ACR admin user aktif agar Azure ML bisa pull image training. Role AcrPull
+  saja tidak cukup di environment ini. Jangan mematikan admin user tanpa
+  menguji ulang pull image.
 
-## 11. Jika ada kegagalan
+## 11. Kendala yang sudah diketahui
+
+1. Activity parameter notebook dengan expression gagal dengan error
+   `6000 Processed HTTP request failed`. Pipeline sekarang tidak memakai
+   activity parameter; notebook memakai default di parameter cell.
+2. Datastore `adls_gold` gagal di-mount dari Azure ML. Training smoke memakai
+   salinan Delta di `workspaceblobstore`.
+3. `%pip` tidak aktif di pipeline notebook. Notebook memakai `subprocess`.
+4. `spark.conf.set` untuk `spark.sql.extensions` ditolak saat runtime.
+5. Image training butuh `libgomp1` (environment `v3`).
+6. MLflow harus versi 2.x; versi 3 memakai endpoint yang tidak didukung.
+7. Prediksi memuat model dari `gold/models/<nama>`, bukan dari registry MLflow.
+
+Rincian ada di `docs/azure/system-flow.md`.
+
+## 12. Jika ada kegagalan
 
 - Baca log di ADF, Synapse, atau Azure ML.
 - Jangan langsung retry.
@@ -170,16 +189,16 @@ Status harus ditulis apa adanya. Jangan menaikkan status `defined` menjadi
 - Laporkan langkah, error, dan status terakhir.
 - Tunggu instruksi manusia.
 
-## 12. Checklist serah terima
+## 13. Checklist serah terima
 
 - [ ] Repo public bisa diakses.
 - [ ] Semua anggota bisa membuka `rg-hidrologi-v0`.
 - [ ] Semua anggota punya `Key Vault Secrets User`.
 - [ ] Trigger ADF `Stopped`.
 - [ ] Tidak ada ADF run.
-- [ ] Tidak ada Azure ML job.
+- [ ] Tidak ada Azure ML job yang sedang berjalan.
 - [ ] Container Apps min 0.
 - [ ] Budget $40 aktif.
 - [ ] CI test success.
 - [ ] CD belum dijalankan.
-- [ ] Data dan model belum dijalankan.
+- [ ] Smoke end-to-end selesai, data dan model ada.

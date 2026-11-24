@@ -173,14 +173,44 @@ Synapse pl_daily_hidrologi_syn
 - Bronze, silver, gold kosong.
 - Model registry kosong.
 
-## Uji minimal nanti
+## Smoke run 2026-11-24
 
-- Window 15 hari, misalnya `2015-10-01` sampai `2015-10-15`.
-- Data pipeline sekitar 25 sampai 35 menit.
-- Training smoke dengan `TRAIN_MIN_ROWS=100` dan sample dates.
-- Prediction `predict_days=1`.
-- Total sekitar 60 sampai 85 menit dan $1,50 sampai $2,00.
-- Metrik smoke bukan hasil penelitian.
+Uji minimal end-to-end dengan window `2015-10-01` sampai `2015-10-15`.
+
+| Tahap | Hasil |
+|---|---|
+| Bronze | 379 file, 15 hari, 3 stasiun, USGS dan Open-Meteo |
+| Silver | 4.295 + 4.295 + 45 + 1.080 baris |
+| Gold | `station_hourly` 1.584, `features` 1.584, `dataset_versions` 1 |
+| Training | job `khaki_guava_h2h0qlfv6x`, 9 model, experiment `hydrology-smoke` |
+| Prediction | 222 baris, 3 stasiun, horizon 1/6/24, issue date 2015-10-14 dan 2015-10-15 |
+
+Smoke memakai pipeline terpisah `pl_smoke_data3` dan `pl_smoke_predict3`,
+retry 0, dan notebook `smoke_*` dengan parameter yang sudah dibekukan.
+Pipeline utama `pl_daily_hidrologi_syn` belum dijalankan.
+
+Metrik smoke bukan hasil penelitian. Angka di atas hanya bukti alur berjalan.
+
+### Kendala yang ditemukan
+
+1. Activity parameter notebook dengan expression gagal dengan error
+   `6000 Processed HTTP request failed`. Semua pipeline sekarang tidak memakai
+   activity parameter; notebook memakai nilai di parameter cell.
+2. Datastore `adls_gold` gagal di-mount (`UriMountSession.Exception`).
+   Training smoke memakai salinan Delta di `workspaceblobstore`
+   (`gold_features/features`) dengan mode `download`.
+3. `%pip` tidak aktif di pipeline notebook; diganti `subprocess` pip install.
+4. `spark.conf.set` untuk `spark.sql.extensions` ditolak saat runtime. Baris
+   dihapus; Delta memakai konfigurasi bawaan Spark 3.5.
+5. Image training butuh `libgomp1`; environment `hydrology-training:v3`.
+6. MLflow 3 memakai endpoint logged-models yang tidak didukung Azure ML.
+   Dependency di-pin ke `mlflow==2.17.2`.
+7. Synapse tidak bisa mengambil token Azure ML untuk registry. Prediksi
+   memuat model dari `gold/models/<nama>`.
+8. ACR admin user harus aktif agar Azure ML bisa pull image. Role `AcrPull`
+   saja tidak cukup di environment ini.
+
+Auto-pause Spark pool dikembalikan ke 15 menit setelah uji.
 
 ## Gap
 
@@ -189,3 +219,6 @@ Synapse pl_daily_hidrologi_syn
 - Belum ada private endpoint.
 - Belum ada autentikasi pengguna.
 - Backfill belum dijalankan.
+- Datastore `adls_gold` belum bisa di-mount dari Azure ML.
+- Model diunggah manual ke `gold/models/<nama>`; belum otomatis dari
+  training job.

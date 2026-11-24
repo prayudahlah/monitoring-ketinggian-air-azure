@@ -1,0 +1,30 @@
+{
+  "properties": {
+    "description": "Smoke prediction 1 day, no activity parameters, retry 0.",
+    "activities": [
+      {
+        "name": "predict",
+        "type": "SynapseNotebook",
+        "dependsOn": [],
+        "policy": {
+          "timeout": "0.04:00:00",
+          "retry": 0,
+          "retryIntervalInSeconds": 300,
+          "secureOutput": false,
+          "secureInput": false
+        },
+        "userProperties": [],
+        "typeProperties": {
+          "notebook": {
+            "referenceName": "smoke_predict",
+            "type": "NotebookReference"
+          },
+          "sparkPool": {
+            "referenceName": "sparksmall",
+            "type": "BigDataPoolReference"
+          }
+        }
+      }
+    ]
+  }
+}

@@ -40,7 +40,7 @@ gold
 synapse
 ```
 
-Semua harus kosong.
+Berisi data smoke 2026-11-24 (379 file bronze, Delta silver dan gold).
 
 **Settings > Configuration**
 
@@ -206,7 +206,7 @@ Jangan klik Trigger now atau Debug.
 
 ### Monitor
 
-**Monitor > Pipeline runs** harus kosong.
+**Monitor > Pipeline runs** berisi run smoke 2026-11-24.
 
 ## 7. Azure ML
 
@@ -237,8 +237,8 @@ Storage account `sthidrogkiq7v7oc3lns`, filesystem `gold`.
 
 ### Jobs dan Models
 
-- **Jobs**: kosong
-- **Models**: kosong
+- **Jobs**: ada smoke job `khaki_guava_h2h0qlfv6x`
+- **Models**: ada 9 model `hydrology-*`
 
 ### MLflow
 
@@ -356,9 +356,9 @@ Run `azure-ci` terakhir harus success. Job `images` dan `serving` harus skipped.
 
 - ADF trigger Stopped
 - ADF run 0
-- Synapse pipeline belum pernah run
+- Synapse pipeline sudah run untuk smoke 2026-11-24
 - Azure ML job 0
 - Compute 0/2
-- Model registry kosong
-- Bronze, silver, gold kosong
+- Model registry berisi 9 model smoke
+- Bronze, silver, gold berisi data smoke
 - Container Apps min 0

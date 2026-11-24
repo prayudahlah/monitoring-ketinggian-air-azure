@@ -26,16 +26,16 @@ dijalankan. `defined` berarti kode atau definisi ada, tetapi belum dieksekusi.
 | B.2 Penjadwalan | Trigger `tr_daily_0600_wib` | ADF Manage > Triggers | Status `Stopped` | `deployed` |
 | B.3 Penanganan kegagalan | Retry, Until status, IfCondition, Fail, metric alert | ADF Author, Azure Monitor | Retry dan alert ada | `deployed` |
 | C.1 Sumber Data | USGS 3 stasiun, Open-Meteo | Buka `01_ingest` | Endpoint dan parameter benar | `defined` |
-| C.2 Perolehan Data | Bronze JSON per `ingest_date` | Storage container `bronze` | Kosong sebelum run | `not run` |
+| C.2 Perolehan Data | Bronze JSON per `ingest_date` | Storage container `bronze` | 379 file, 15 hari | `deployed` |
 | C.3 Pembersihan dan Pengolahan | `02_silver` dan `03_gold` | Buka notebook | Schema, dedup, DQ, Delta terlihat | `defined` |
 | D.1 Rekayasa Fitur | 48 fitur di `03_gold` dan `azureml/src/schema.py` | Buka notebook dan schema | Daftar fitur sama | `defined` |
 | D.2 Target dan Horizon | `y_h1`, `y_h6`, `y_h24` | Buka `03_gold` | Tiga target ada | `defined` |
-| D.3 Prosedur Pelatihan | Azure ML job `azureml/train_job.yml` | ML Studio Jobs | Job belum ada | `not run` |
+| D.3 Prosedur Pelatihan | Azure ML job `azureml/train_job.yml` | ML Studio Jobs | Smoke job selesai, 9 model | `deployed` |
 | D.4 Parameter Model | `azureml/src/train.py` | Buka file | LightGBM dan early stopping ada | `defined` |
-| D.5 Evaluasi Model | MAE, RMSE, bias, NSE, KGE, POD/FAR/CSI, gate 2% | Buka `azureml/src/metrics.py` | Metrik dan gate ada | `defined` |
+| D.5 Evaluasi Model | MAE, RMSE, bias, NSE, KGE, POD/FAR/CSI, gate 2% | ML Studio run `hydrology-smoke` | Metrik dan gate ada | `deployed` |
 | E.1 API Inference | `ca-api-hidrologi` | URL `/health`, `/stations`, `/predict` | 200, 200, 503 | `deployed` + `placeholder` |
 | E.2 Dashboard | `ca-dash-hidrologi` | URL dashboard | 200, empty state | `deployed` + `placeholder` |
-| E.3 MLOps | Managed MLflow dan registry | ML Studio Environments, Models | Environment v1 ada, model kosong | `defined` |
+| E.3 MLOps | Managed MLflow dan registry | ML Studio Environments, Models | Environment v3 ada, 9 model smoke | `deployed` |
 | E.4 CI/CD | GitHub Actions OIDC | Tab Actions | Test success, CD skipped | `deployed` |
 | E.5 Keamanan dan Biaya | MI, RBAC, Key Vault, budget, alert | IAM, Key Vault, Budget | Role, secret, alert, budget ada | `deployed` |
 | F.1 Sumber Daya Azure | `eastasia`, SKU, compute | Portal dan Bicep | Region dan SKU sesuai | `deployed` |
@@ -60,15 +60,15 @@ dijalankan. `defined` berarti kode atau definisi ada, tetapi belum dieksekusi.
 
 - Storage account `sthidrogkiq7v7oc3lns`.
 - Container `bronze`, `silver`, `gold`, `synapse`.
-- Sebelum run, semua kosong.
+- Data smoke 2026-11-24 sudah ada di container.
 - Buka notebook `01_ingest`, `02_silver`, `03_gold` untuk kode.
 
 ### Pemodelan
 
 - Azure ML Studio > Environments > `hydrology-training` > `v1`.
 - Azure ML Studio > Compute > `cpu-cluster`, min 0.
-- Azure ML Studio > Jobs, harus kosong.
-- Azure ML Studio > Models, harus kosong.
+- Azure ML Studio > Jobs, ada smoke job `khaki_guava_h2h0qlfv6x`.
+- Azure ML Studio > Models, ada 9 model `hydrology-*`.
 
 ### Layanan
 
@@ -89,7 +89,7 @@ dijalankan. `defined` berarti kode atau definisi ada, tetapi belum dieksekusi.
 |---|---|
 | A | Screenshot resource group dan diagram |
 | B | Screenshot ADF canvas, Synapse pipeline, trigger Stopped |
-| C | Screenshot container kosong dan notebook silver/gold |
+| C | Screenshot container berisi data smoke dan notebook silver/gold |
 | D | Screenshot environment, compute, dan konfigurasi training |
 | E | Screenshot API health, dashboard, IAM, budget, CI |
 | F | Screenshot resource group dan Bicep |
@@ -98,6 +98,9 @@ dijalankan. `defined` berarti kode atau definisi ada, tetapi belum dieksekusi.
 
 - ADF memakai fallback Web Activity + polling. Activity notebook langsung
   belum berhasil.
+- Smoke run 2026-11-24 membuktikan alur data, training, dan prediksi berjalan.
+  Rincian dan kendala ada di `docs/azure/system-flow.md`.
+- ADF fallback belum dijalankan. Trigger tetap `Stopped`.
 - API dan dashboard masih placeholder.
-- Smoke test nanti tidak boleh dipakai sebagai hasil penelitian.
+- Smoke test tidak boleh dipakai sebagai hasil penelitian.
 - Jika dokumen berbeda dengan Azure, verifikasi ke resource dan kode.
