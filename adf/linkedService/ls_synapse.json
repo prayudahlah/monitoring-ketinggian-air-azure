@@ -1,0 +1,9 @@
+{
+  "type": "AzureSynapseArtifacts",
+  "typeProperties": {
+    "endpoint": "https://syn-hidrologi-v0.dev.azuresynapse.net",
+    "authentication": "ManagedServiceIdentity",
+    "workspaceResourceId": "/subscriptions/838d94c7-d2fd-4c8c-8ceb-ad3ce9dfc707/resourceGroups/rg-hidrologi-v0/providers/Microsoft.Synapse/workspaces/syn-hidrologi-v0"
+  },
+  "annotations": []
+}

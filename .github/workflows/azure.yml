@@ -1,0 +1,88 @@
+name: azure-ci
+
+on:
+  workflow_dispatch:
+    inputs:
+      deploy_serving:
+        description: Build images and deploy the Container Apps serving layer
+        type: boolean
+        default: false
+
+permissions:
+  id-token: write
+  contents: read
+
+env:
+  AZURE_RESOURCE_GROUP: rg-hidrologi-v0
+  AZURE_ACR_NAME: acrhidrogkiq7v7oc3lns
+  AZURE_ACR_LOGIN_SERVER: acrhidrogkiq7v7oc3lns.azurecr.io
+  AZURE_STORAGE_ACCOUNT: sthidrogkiq7v7oc3lns
+  AZURE_KEYVAULT_NAME: kv-hidro-gkiq7v7oc3lns
+  AZURE_KEYVAULT_URI: https://kv-hidro-gkiq7v7oc3lns.vault.azure.net/
+  AZURE_SYNAPSE_NAME: syn-hidrologi-v0
+  AZURE_ML_WORKSPACE: mlw-hidrologi-v0
+  AZURE_DATA_FACTORY: adf-hidrologi-v0
+  MLFLOW_TRACKING_URI: https://eastasia.api.azureml.ms/mlflow/v1.0/subscriptions/838d94c7-d2fd-4c8c-8ceb-ad3ce9dfc707/resourceGroups/rg-hidrologi-v0/providers/Microsoft.MachineLearningServices/workspaces/mlw-hidrologi-v0
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Install lint dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install ruff
+      - name: Lint
+        run: ruff check serving azureml/src infra/scripts
+      - name: Compile Python
+        run: python -m compileall -q azureml/src infra/scripts
+
+  images:
+    needs: test
+    if: ${{ inputs.deploy_serving }}
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: azure/login@v2
+        with:
+          client-id: ${{ secrets.AZURE_CLIENT_ID }}
+          tenant-id: ${{ secrets.AZURE_TENANT_ID }}
+          subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
+      - name: Build and push images
+        run: |
+          az acr login --name "$AZURE_ACR_NAME"
+          docker buildx build --platform linux/amd64 --provenance=false --sbom=false \
+            --output type=image,name="$AZURE_ACR_LOGIN_SERVER/api:${GITHUB_SHA}",push=true,oci-mediatypes=true \
+            serving/api
+          docker buildx build --platform linux/amd64 --provenance=false --sbom=false \
+            --output type=image,name="$AZURE_ACR_LOGIN_SERVER/dashboard:${GITHUB_SHA}",push=true,oci-mediatypes=true \
+            serving/dashboard
+          docker buildx build --platform linux/amd64 --provenance=false --sbom=false \
+            --output type=image,name="$AZURE_ACR_LOGIN_SERVER/training:${GITHUB_SHA}",push=true,oci-mediatypes=true \
+            -f azureml/Dockerfile azureml
+
+  serving:
+    needs: images
+    if: ${{ inputs.deploy_serving }}
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: azure/login@v2
+        with:
+          client-id: ${{ secrets.AZURE_CLIENT_ID }}
+          tenant-id: ${{ secrets.AZURE_TENANT_ID }}
+          subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
+      - name: Update Container Apps
+        run: |
+          az containerapp update \
+            --resource-group "$AZURE_RESOURCE_GROUP" \
+            --name ca-api-hidrologi \
+            --image "$AZURE_ACR_LOGIN_SERVER/api:${GITHUB_SHA}"
+          az containerapp update \
+            --resource-group "$AZURE_RESOURCE_GROUP" \
+            --name ca-dash-hidrologi \
+            --image "$AZURE_ACR_LOGIN_SERVER/dashboard:${GITHUB_SHA}"

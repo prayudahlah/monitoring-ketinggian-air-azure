@@ -1,0 +1,7 @@
+{
+  "type": "AzureKeyVault",
+  "typeProperties": {
+    "baseUrl": "https://kv-hidro-gkiq7v7oc3lns.vault.azure.net/"
+  },
+  "annotations": []
+}

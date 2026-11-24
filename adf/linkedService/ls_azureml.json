@@ -1,0 +1,10 @@
+{
+  "type": "AzureMLService",
+  "typeProperties": {
+    "subscriptionId": "838d94c7-d2fd-4c8c-8ceb-ad3ce9dfc707",
+    "resourceGroupName": "rg-hidrologi-v0",
+    "mlWorkspaceName": "mlw-hidrologi-v0",
+    "authentication": "ManagedServiceIdentity"
+  },
+  "annotations": []
+}

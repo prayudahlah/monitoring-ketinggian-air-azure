@@ -1,0 +1,25 @@
+{
+  "type": "ScheduleTrigger",
+  "typeProperties": {
+    "recurrence": {
+      "frequency": "Day",
+      "interval": 1,
+      "startTime": "2026-11-25T23:00:00Z",
+      "timeZone": "UTC"
+    }
+  },
+  "pipelines": [
+    {
+      "pipelineReference": {
+        "referenceName": "pl_daily_hidrologi",
+        "type": "PipelineReference"
+      },
+      "parameters": {
+        "window_start": "@formatDateTime(addDays(utcNow(), -2), 'yyyy-MM-dd')",
+        "window_end": "@formatDateTime(utcNow(), 'yyyy-MM-dd')",
+        "predict_days": "7"
+      }
+    }
+  ],
+  "runtimeState": "Stopped"
+}

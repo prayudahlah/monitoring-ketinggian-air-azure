@@ -1,0 +1,171 @@
+{
+  "properties": {
+    "description": "Native ingest, silver, gold, and prediction notebooks.",
+    "parameters": {
+      "window_start": {
+        "type": "String",
+        "defaultValue": "2015-10-01"
+      },
+      "window_end": {
+        "type": "String",
+        "defaultValue": "2015-10-31"
+      },
+      "predict_days": {
+        "type": "String",
+        "defaultValue": "7"
+      }
+    },
+    "activities": [
+      {
+        "name": "ingest_bronze",
+        "type": "SynapseNotebook",
+        "dependsOn": [],
+        "policy": {
+          "timeout": "0.04:00:00",
+          "retry": 2,
+          "retryIntervalInSeconds": 300,
+          "secureOutput": false,
+          "secureInput": false
+        },
+        "userProperties": [],
+        "typeProperties": {
+          "notebook": {
+            "referenceName": "01_ingest",
+            "type": "NotebookReference"
+          },
+          "sparkPool": {
+            "referenceName": "sparksmall",
+            "type": "BigDataPoolReference"
+          },
+          "parameters": {
+            "window_start": {
+              "value": "@pipeline().parameters.window_start",
+              "type": "Expression"
+            },
+            "window_end": {
+              "value": "@pipeline().parameters.window_end",
+              "type": "Expression"
+            }
+          }
+        }
+      },
+      {
+        "name": "transform_silver",
+        "type": "SynapseNotebook",
+        "dependsOn": [
+          {
+            "activity": "ingest_bronze",
+            "dependencyConditions": [
+              "Succeeded"
+            ]
+          }
+        ],
+        "policy": {
+          "timeout": "0.04:00:00",
+          "retry": 2,
+          "retryIntervalInSeconds": 300,
+          "secureOutput": false,
+          "secureInput": false
+        },
+        "userProperties": [],
+        "typeProperties": {
+          "notebook": {
+            "referenceName": "02_silver",
+            "type": "NotebookReference"
+          },
+          "sparkPool": {
+            "referenceName": "sparksmall",
+            "type": "BigDataPoolReference"
+          },
+          "parameters": {
+            "window_start": {
+              "value": "@pipeline().parameters.window_start",
+              "type": "Expression"
+            },
+            "window_end": {
+              "value": "@pipeline().parameters.window_end",
+              "type": "Expression"
+            }
+          }
+        }
+      },
+      {
+        "name": "build_gold",
+        "type": "SynapseNotebook",
+        "dependsOn": [
+          {
+            "activity": "transform_silver",
+            "dependencyConditions": [
+              "Succeeded"
+            ]
+          }
+        ],
+        "policy": {
+          "timeout": "0.04:00:00",
+          "retry": 2,
+          "retryIntervalInSeconds": 300,
+          "secureOutput": false,
+          "secureInput": false
+        },
+        "userProperties": [],
+        "typeProperties": {
+          "notebook": {
+            "referenceName": "03_gold",
+            "type": "NotebookReference"
+          },
+          "sparkPool": {
+            "referenceName": "sparksmall",
+            "type": "BigDataPoolReference"
+          },
+          "parameters": {
+            "window_start": {
+              "value": "@pipeline().parameters.window_start",
+              "type": "Expression"
+            },
+            "window_end": {
+              "value": "@pipeline().parameters.window_end",
+              "type": "Expression"
+            }
+          }
+        }
+      },
+      {
+        "name": "predict",
+        "type": "SynapseNotebook",
+        "dependsOn": [
+          {
+            "activity": "build_gold",
+            "dependencyConditions": [
+              "Succeeded"
+            ]
+          }
+        ],
+        "policy": {
+          "timeout": "0.04:00:00",
+          "retry": 2,
+          "retryIntervalInSeconds": 300,
+          "secureOutput": false,
+          "secureInput": false
+        },
+        "userProperties": [],
+        "typeProperties": {
+          "notebook": {
+            "referenceName": "04_predict",
+            "type": "NotebookReference"
+          },
+          "sparkPool": {
+            "referenceName": "sparksmall",
+            "type": "BigDataPoolReference"
+          },
+          "parameters": {
+            "predict_days": {
+              "value": "@pipeline().parameters.predict_days",
+              "type": "Expression"
+            }
+          }
+        }
+      }
+    ],
+    "annotations": []
+  }
+}

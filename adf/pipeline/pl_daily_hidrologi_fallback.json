@@ -1,0 +1,193 @@
+{
+  "description": "Fallback: start Synapse pipeline and poll its status.",
+  "parameters": {
+    "window_start": {
+      "type": "String",
+      "defaultValue": "2015-10-01"
+    },
+    "window_end": {
+      "type": "String",
+      "defaultValue": "2015-10-31"
+    },
+    "predict_days": {
+      "type": "String",
+      "defaultValue": "7"
+    }
+  },
+  "variables": {
+    "run_id": {
+      "type": "String"
+    },
+    "status": {
+      "type": "String"
+    }
+  },
+  "activities": [
+    {
+      "name": "start_synapse",
+      "type": "WebActivity",
+      "dependsOn": [],
+      "policy": {
+        "timeout": "0.01:00:00",
+        "retry": 2,
+        "retryIntervalInSeconds": 60,
+        "secureOutput": false,
+        "secureInput": false
+      },
+      "userProperties": [],
+      "typeProperties": {
+        "url": "https://syn-hidrologi-v0.dev.azuresynapse.net/pipelines/pl_daily_hidrologi_syn/createRun?api-version=2020-12-01",
+        "method": "POST",
+        "headers": {
+          "Content-Type": "application/json"
+        },
+        "body": {
+          "window_start": "@pipeline().parameters.window_start",
+          "window_end": "@pipeline().parameters.window_end",
+          "predict_days": "@pipeline().parameters.predict_days"
+        },
+        "authentication": {
+          "type": "MSI",
+          "resource": "https://dev.azuresynapse.net"
+        }
+      }
+    },
+    {
+      "name": "set_run_id",
+      "type": "SetVariable",
+      "dependsOn": [
+        {
+          "activity": "start_synapse",
+          "dependencyConditions": [
+            "Succeeded"
+          ]
+        }
+      ],
+      "userProperties": [],
+      "typeProperties": {
+        "variableName": "run_id",
+        "value": {
+          "value": "@activity('start_synapse').output.runId",
+          "type": "Expression"
+        }
+      }
+    },
+    {
+      "name": "wait_for_synapse",
+      "type": "Until",
+      "dependsOn": [
+        {
+          "activity": "set_run_id",
+          "dependencyConditions": [
+            "Succeeded"
+          ]
+        }
+      ],
+      "userProperties": [],
+      "typeProperties": {
+        "expression": {
+          "value": "@or(equals(variables('status'), 'Succeeded'), or(equals(variables('status'), 'Failed'), equals(variables('status'), 'Cancelled')))",
+          "type": "Expression"
+        },
+        "timeout": "0.04:00:00",
+        "activities": [
+          {
+            "name": "get_synapse_status",
+            "type": "WebActivity",
+            "dependsOn": [],
+            "policy": {
+              "timeout": "0.00:05:00",
+              "retry": 2,
+              "retryIntervalInSeconds": 30,
+              "secureOutput": false,
+              "secureInput": false
+            },
+            "userProperties": [],
+            "typeProperties": {
+              "url": {
+                "value": "@concat('https://syn-hidrologi-v0.dev.azuresynapse.net/pipelines/pl_daily_hidrologi_syn/pipelineruns/', variables('run_id'), '?api-version=2020-12-01')",
+                "type": "Expression"
+              },
+              "method": "GET",
+              "authentication": {
+                "type": "MSI",
+                "resource": "https://dev.azuresynapse.net"
+              }
+            }
+          },
+          {
+            "name": "set_status",
+            "type": "SetVariable",
+            "dependsOn": [
+              {
+                "activity": "get_synapse_status",
+                "dependencyConditions": [
+                  "Succeeded"
+                ]
+              }
+            ],
+            "userProperties": [],
+            "typeProperties": {
+              "variableName": "status",
+              "value": {
+                "value": "@activity('get_synapse_status').output.status",
+                "type": "Expression"
+              }
+            }
+          },
+          {
+            "name": "sleep_60",
+            "type": "Wait",
+            "dependsOn": [
+              {
+                "activity": "set_status",
+                "dependencyConditions": [
+                  "Succeeded"
+                ]
+              }
+            ],
+            "userProperties": [],
+            "typeProperties": {
+              "waitTimeInSeconds": 60
+            }
+          }
+        ]
+      }
+    },
+    {
+      "name": "fail_if_not_success",
+      "type": "IfCondition",
+      "dependsOn": [
+        {
+          "activity": "wait_for_synapse",
+          "dependencyConditions": [
+            "Succeeded"
+          ]
+        }
+      ],
+      "userProperties": [],
+      "typeProperties": {
+        "expression": {
+          "value": "@not(equals(variables('status'), 'Succeeded'))",
+          "type": "Expression"
+        },
+        "ifTrueActivities": [
+          {
+            "name": "fail_run",
+            "type": "Fail",
+            "dependsOn": [],
+            "userProperties": [],
+            "typeProperties": {
+              "message": {
+                "value": "@concat('Synapse pipeline failed with status ', variables('status'))",
+                "type": "Expression"
+              },
+              "errorCode": "SynapsePipelineFailed"
+            }
+          }
+        ]
+      }
+    }
+  ],
+  "annotations": []
+}

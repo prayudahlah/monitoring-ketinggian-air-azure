@@ -1,0 +1,5 @@
+$schema: https://azuremlschemas.azureedge.net/latest/environment.schema.json
+name: hydrology-training
+version: v1
+description: Native LightGBM training environment, no Prefect.
+image: acrhidrogkiq7v7oc3lns.azurecr.io/training:v1

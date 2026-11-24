@@ -1,0 +1,11 @@
+.env*
+!.env.example
+__pycache__/
+*.pyc
+*.whl
+dist/
+build/
+.azure/
+.venv/
+.DS_Store
+.ruff_cache/

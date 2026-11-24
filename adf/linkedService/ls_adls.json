@@ -1,0 +1,8 @@
+{
+  "type": "AzureBlobFS",
+  "typeProperties": {
+    "url": "https://sthidrogkiq7v7oc3lns.dfs.core.windows.net",
+    "authenticationType": "ManagedServiceIdentity"
+  },
+  "annotations": []
+}
