@@ -33,7 +33,6 @@ var containers = [
   'silver'
   'gold'
   'synapse'
-  'wheels'
 ]
 
 resource container 'Microsoft.Storage/storageAccounts/blobServices/containers@2023-05-01' = [

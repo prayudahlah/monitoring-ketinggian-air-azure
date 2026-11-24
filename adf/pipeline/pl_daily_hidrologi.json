@@ -1,5 +1,5 @@
 {
-  "description": "Native ingest, silver, gold, and prediction notebooks.",
+  "description": "Ingest, silver, gold, and prediction notebooks.",
   "parameters": {
     "window_start": {
       "type": "String",

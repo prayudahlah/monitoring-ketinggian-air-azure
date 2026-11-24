@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Upload native Synapse notebooks and create the Synapse pipeline.
+"""Upload Synapse notebooks and create the Synapse pipeline.
 
 No notebook is executed. This is an artifact deployment only.
 """

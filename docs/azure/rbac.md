@@ -1,4 +1,4 @@
-# RBAC Azure Native
+# RBAC Azure
 
 ## Workload identity
 

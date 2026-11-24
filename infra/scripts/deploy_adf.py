@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """Deploy ADF linked services, the daily pipeline and a stopped trigger.
 
-Tries the native SynapseNotebook activity first. If ADF rejects the notebook
+Tries the SynapseNotebook activity first. If ADF rejects the notebook
 reference, deploys the Web Activity + Until polling fallback instead.
 """
 
@@ -42,25 +42,25 @@ def create_linked_services() -> None:
 
 
 def create_pipeline() -> None:
-    native = ROOT / "adf/pipeline/pl_daily_hidrologi.json"
+    notebook_pipeline = ROOT / "adf/pipeline/pl_daily_hidrologi.json"
     fallback = ROOT / "adf/pipeline/pl_daily_hidrologi_fallback.json"
     try:
-        print("trying native SynapseNotebook pipeline")
+        print("trying SynapseNotebook pipeline")
         run(
             "az", "datafactory", "pipeline", "create",
             "--resource-group", RG,
             "--factory-name", ADF,
             "--name", "pl_daily_hidrologi",
-            "--pipeline", f"@{native}",
+            "--pipeline", f"@{notebook_pipeline}",
             "--output", "none",
         )
-        print("native pipeline deployed")
+        print("SynapseNotebook pipeline deployed")
         return
     except RuntimeError as exc:
         message = str(exc)
         if "invalid reference" not in message:
             raise
-        print("native reference rejected; deploying fallback")
+        print("notebook reference rejected; deploying fallback")
     run(
         "az", "datafactory", "pipeline", "create",
         "--resource-group", RG,

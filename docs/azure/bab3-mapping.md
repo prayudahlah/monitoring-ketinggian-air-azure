@@ -1,4 +1,4 @@
-# Mapping Bab III - Azure Native
+# Mapping Bab III - Azure
 
 | Subbab | Implementasi |
 |---|---|
@@ -29,7 +29,7 @@
 Nyata:
 
 - Infrastruktur dan identity.
-- Notebook native dan Synapse pipeline.
+- Notebook dan Synapse pipeline.
 - ADF fallback dengan polling.
 - Azure ML environment dan job definition.
 - Container Apps API/dashboard.

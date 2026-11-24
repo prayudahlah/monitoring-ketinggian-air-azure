@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# Build the Azure ML training image without Prefect.
+# Build the Azure ML training image.
 set -euo pipefail
 
 ACR="${AZURE_ACR_NAME:-acrhidrogkiq7v7oc3lns}"

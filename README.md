@@ -1,7 +1,6 @@
-﻿# Monitoring Ketinggian Air - Azure Native
+# Monitoring Ketinggian Air - Azure
 
-Azure-native implementation of the hydrology medallion pipeline. The local
-Prefect/Garage experiment is intentionally not part of this repository.
+Azure implementation of the hydrology medallion pipeline.
 
 ## Services
 
@@ -29,7 +28,7 @@ Key Vault, ACR, Log Analytics, Application Insights, Budget
 ```text
 infra/bicep/          Azure infrastructure
 infra/scripts/        deployment helpers
-synapse/notebooks/    native PySpark notebooks, code visible
+synapse/notebooks/    PySpark notebooks, code visible
 synapse/pipeline/     Synapse pipeline definition
 adf/                  linked services, pipeline, stopped trigger
 azureml/              training image, environment, job
@@ -37,11 +36,10 @@ serving/              API and dashboard containers
 docs/azure/           architecture, mapping, runbook, RBAC
 ```
 
-## No local runtime in Azure
+## Implementation
 
-The Azure path does not use Prefect, Garage, S3, Docker Compose, or local
-paths. Synapse notebooks contain the transformations directly. The training
-job is a plain Azure ML command job.
+Synapse notebooks contain the transformations directly. Training runs as an
+Azure ML command job.
 
 ## Current status
 

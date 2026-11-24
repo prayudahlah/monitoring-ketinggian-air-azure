@@ -1,4 +1,4 @@
-"""Shared column contract for the Azure-native training job."""
+"""Shared column contract for the training job."""
 
 STATIONS = (
     "11525670",

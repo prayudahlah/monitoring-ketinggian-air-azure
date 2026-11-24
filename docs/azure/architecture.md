@@ -1,4 +1,4 @@
-# Arsitektur Azure Native
+# Arsitektur Azure
 
 ```mermaid
 flowchart LR
@@ -36,7 +36,7 @@ Alur:
 6. `04_predict` memuat model terbaru dan menulis predictions Delta.
 7. Container Apps menyajikan API dan dashboard.
 
-Tidak ada Prefect, Garage, S3, atau path lokal di jalur Azure.
+Jalur data berjalan di layanan Azure.
 
 ## Identity
 

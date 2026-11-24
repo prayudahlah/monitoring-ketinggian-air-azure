@@ -1,4 +1,4 @@
-# Runbook Azure Native
+# Runbook Azure
 
 Jangan jalankan pipeline sebelum sample dan budget disetujui.
 
@@ -12,7 +12,7 @@ az ml environment create --file azureml/environment.yml \
   --resource-group rg-hidrologi-v0 --workspace-name mlw-hidrologi-v0
 ```
 
-ADF native `SynapseNotebook` akan dicoba lebih dulu. Kalau ditolak, script
+ADF `SynapseNotebook` akan dicoba lebih dulu. Kalau ditolak, script
 memakai pipeline fallback dengan polling status.
 
 Untuk GitHub Actions di repo baru, tambahkan federated credential

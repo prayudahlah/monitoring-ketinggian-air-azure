@@ -1,7 +1,7 @@
 $schema: https://azuremlschemas.azureedge.net/latest/commandJob.schema.json
 type: command
 experiment_name: hydrology-training
-display_name: hydrology-lightgbm-native
+display_name: hydrology-lightgbm
 compute: azureml:cpu-cluster
 environment: azureml:hydrology-training@latest
 code: src

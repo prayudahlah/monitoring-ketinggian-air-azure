@@ -25,7 +25,7 @@ app = FastAPI(
 def health() -> dict:
     return {
         "status": "ok",
-        "environment": os.getenv("ENVIRONMENT", "local"),
+        "environment": os.getenv("ENVIRONMENT", "unset"),
         "storage_account": os.getenv("AZURE_STORAGE_ACCOUNT", ""),
         "model": "not_loaded",
     }
